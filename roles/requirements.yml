@@ -1,0 +1,4 @@
+---
+roles:
+  - name: AMAZON2023-CIS
+    src: https://github.com/Riyan-plivo/AMAZON2023-CIS.git
