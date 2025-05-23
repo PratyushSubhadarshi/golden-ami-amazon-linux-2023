@@ -1,0 +1,65 @@
+- name: Configure Time Synchronization and Package Management
+  hosts: default
+  connection: ssh
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  tasks:
+    # Ensure Python 3 dnf module is installed
+    - name: Ensure Python 3 dnf module is installed
+      dnf:
+        name: python3-dnf
+        state: present
+      become: yes
+
+    # Install Chrony package (using dnf)
+    - name: Install Chrony package (using dnf)
+      dnf:
+        name: chrony
+        state: present
+      become: yes
+
+    # Enable Chrony service
+    - name: Enable Chrony service
+      systemd:
+        name: chronyd
+        enabled: yes
+      become: yes
+
+    # Start Chrony service
+    - name: Start Chrony service
+      systemd:
+        name: chronyd
+        state: started
+      become: yes
+
+    # Configure Chrony
+    - name: Configure Chrony
+      blockinfile:
+        path: /etc/chrony.conf
+        block: |
+          server 169.254.169.123 prefer iburst
+          pool 0.amazon.pool.ntp.org iburst
+          pool 1.amazon.pool.ntp.org iburst
+          pool 2.amazon.pool.ntp.org iburst
+          pool 3.amazon.pool.ntp.org iburst
+      become: yes
+
+    # Restart Chrony service
+    - name: Restart Chrony service
+      systemd:
+        name: chronyd
+        state: restarted
+      become: yes
+
+
+- name: Harden Image
+  hosts: default
+  connection: ssh
+  become: yes
+  become_user: root
+  become_method: sudo
+
+  roles:
+    - AMAZON2023-CIS
